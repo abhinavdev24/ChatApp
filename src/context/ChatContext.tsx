@@ -1,10 +1,12 @@
 import { ReactNode, createContext, useContext, useReducer } from "react";
 import { AuthContext } from "./AuthContext";
 import { Chat, ChatContextAction } from "../types";
+import { Timestamp } from "firebase/firestore";
 
 const INITIAL_STATE: Chat = {
   chatId: "",
   userInfo: { displayName: "", photoURL: "", uid: "" },
+  date: Timestamp.now(),
 };
 
 export const ChatContext = createContext<{
@@ -25,6 +27,7 @@ export const ChatContextProvider = ({ children }: { children: ReactNode }) => {
               currentUser.uid > action.payload.uid
                 ? currentUser.uid + action.payload.uid
                 : action.payload.uid + currentUser.uid,
+            date: Timestamp.now(),
           };
         return state;
       default:

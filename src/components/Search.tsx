@@ -61,6 +61,7 @@ const Search = () => {
               photoURL: user.photoURL,
             } as UserInfo,
             [combinedId + ".date"]: serverTimestamp(),
+            [combinedId + ".lastMessage"]: "",
           });
 
           await updateDoc(doc(db, "userChats", user.uid), {
@@ -70,6 +71,7 @@ const Search = () => {
               photoURL: currentUser.photoURL,
             } as UserInfo,
             [combinedId + ".date"]: serverTimestamp(),
+            [combinedId + ".lastMessage"]: "",
           });
         }
       } catch (err) {

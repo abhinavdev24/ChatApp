@@ -22,6 +22,7 @@ const Chats = () => {
                 chatId: chat[0],
                 userInfo: chat[1].userInfo,
                 date: chat[1].date,
+                lastMessage: chat[1].lastMessage ? chat[1].lastMessage : "",
               };
             })
           );
@@ -32,26 +33,28 @@ const Chats = () => {
       unsub();
     };
   }, [currentUser]);
-
+  console.log("chat", chats);
   const handleSelect = (userInfo: UserInfo) => {
     dispatch({ type: "CHANGE_USER", payload: userInfo } as ChatContextAction);
   };
 
   return (
     <div className="chats">
-      {chats.map((chat) => (
-        <div
-          className="userChat"
-          key={chat.chatId}
-          onClick={() => handleSelect(chat.userInfo)}
-        >
-          <img src={chat.userInfo.photoURL} alt="" />
-          <div className="userChatInfo">
-            <span>{chat.userInfo.displayName}</span>
-            <p>{chat.userInfo.lastMessage}</p>
+      {chats
+        .sort((a, b) => b.date && a.date && b.date.seconds - a.date.seconds)
+        .map((chat) => (
+          <div
+            className="userChat"
+            key={chat.chatId}
+            onClick={() => handleSelect(chat.userInfo)}
+          >
+            <img src={chat.userInfo.photoURL} alt="" />
+            <div className="userChatInfo">
+              <span>{chat.userInfo.displayName}</span>
+              <p>{chat.lastMessage}</p>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
     </div>
   );
 };

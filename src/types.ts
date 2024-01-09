@@ -12,7 +12,6 @@ export interface UserInfo {
   displayName: string;
   photoURL: string;
   uid: string;
-  lastMessage?: string;
 }
 
 /**
@@ -25,20 +24,21 @@ export interface UserInfo {
 export interface Chat {
   chatId: string;
   userInfo: UserInfo;
-  date?: Timestamp;
+  date: Timestamp;
+  lastMessage?: string;
 }
 
 /**
  * Represents a chat message. Related collection - "chats"
  *
- * @interface Message
+ * @interface MessageType
  * @property {string} id - The unique identifier of the message.
  * @property {string} text - The text content of the message.
  * @property {string} senderId - The unique identifier of the message sender.
  * @property {Timestamp} date - The timestamp indicating when the message was sent.
  * @property {string} img - The URL of an image associated with the message.
  */
-export interface Message {
+export interface MessageType {
   id: string;
   text: string;
   senderId: string;

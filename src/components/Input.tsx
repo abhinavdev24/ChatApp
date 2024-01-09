@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import { v4 as uuid } from "uuid";
-import { Message } from "../types";
+import { MessageType } from "../types";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 
 const Input = () => {
@@ -24,8 +24,8 @@ const Input = () => {
   const { data } = useContext(ChatContext);
 
   const handleSend = async () => {
-    if (currentUser) {
-      const message: Message = {
+    if (currentUser && data.chatId) {
+      const message: MessageType = {
         id: uuid(),
         text,
         senderId: currentUser?.uid,
@@ -51,7 +51,7 @@ const Input = () => {
                   messages: arrayUnion({
                     ...message,
                     img: downloadURL,
-                  } as Message),
+                  } as MessageType),
                 });
               }
             );
@@ -63,16 +63,12 @@ const Input = () => {
         });
       }
       await updateDoc(doc(db, "userChats", currentUser.uid), {
-        [data.chatId + ".lastMessage"]: {
-          text,
-        },
+        [data.chatId + ".lastMessage"]: text,
         [data.chatId + ".date"]: serverTimestamp(),
       });
 
       await updateDoc(doc(db, "userChats", data.userInfo.uid), {
-        [data.chatId + ".lastMessage"]: {
-          text,
-        },
+        [data.chatId + ".lastMessage"]: text,
         [data.chatId + ".date"]: serverTimestamp(),
       });
       setText("");
