@@ -1,60 +1,50 @@
+import { DocumentData, doc, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { ChatContext } from "../context/ChatContext";
+import { ChatContextAction, UserInfo } from "../types";
+
 const Chats = () => {
+  const [chats, setChats] = useState<DocumentData>([]);
+  const currentUser = useContext(AuthContext);
+  const { dispatch } = useContext(ChatContext);
+
+  useEffect(() => {
+    let unsub = () => {};
+    if (currentUser) {
+      unsub = onSnapshot(doc(db, "userChats", currentUser.uid), (doc) => {
+        const data = doc.data();
+        if (data) setChats(data);
+      });
+    }
+
+    return () => {
+      unsub();
+    };
+  }, [currentUser]);
+
+  console.log(Object.entries(chats));
+
+  const handleSelect = (userInfo: UserInfo) => {
+    dispatch({ type: "CHANGE_USER", payload: userInfo } as ChatContextAction);
+  };
+
   return (
     <div className="chats">
-      <div className="userChat">
-        <img
-          src="https://images.sftcdn.net/images/t_app-cover-l,f_auto/p/e76d4296-43f3-493b-9d50-f8e5c142d06c/2117667014/boys-profile-picture-screenshot.png"
-          alt=""
-        />
-        <div className="userChatInfo">
-          <span>Jane</span>
-          <p>Hello</p>
+      {Object.entries(chats)?.map((chat) => (
+        <div
+          className="userChat"
+          key={chat[0]}
+          onClick={() => handleSelect(chat[1].userInfo)}
+        >
+          <img src={chat[1].userInfo.photoURL} alt="" />
+          <div className="userChatInfo">
+            <span>{chat[1].userInfo.displayName}</span>
+            <p>{chat[1].userInfo.lastMessage?.text}</p>
+          </div>
         </div>
-      </div>
-
-      <div className="userChat">
-        <img
-          src="https://images.sftcdn.net/images/t_app-cover-l,f_auto/p/e76d4296-43f3-493b-9d50-f8e5c142d06c/2117667014/boys-profile-picture-screenshot.png"
-          alt=""
-        />
-        <div className="userChatInfo">
-          <span>Jane</span>
-          <p>Hello</p>
-        </div>
-      </div>
-
-      <div className="userChat">
-        <img
-          src="https://images.sftcdn.net/images/t_app-cover-l,f_auto/p/e76d4296-43f3-493b-9d50-f8e5c142d06c/2117667014/boys-profile-picture-screenshot.png"
-          alt=""
-        />
-        <div className="userChatInfo">
-          <span>Jane</span>
-          <p>Hello</p>
-        </div>
-      </div>
-
-      <div className="userChat">
-        <img
-          src="https://images.sftcdn.net/images/t_app-cover-l,f_auto/p/e76d4296-43f3-493b-9d50-f8e5c142d06c/2117667014/boys-profile-picture-screenshot.png"
-          alt=""
-        />
-        <div className="userChatInfo">
-          <span>Jane</span>
-          <p>Hello</p>
-        </div>
-      </div>
-
-      <div className="userChat">
-        <img
-          src="https://images.sftcdn.net/images/t_app-cover-l,f_auto/p/e76d4296-43f3-493b-9d50-f8e5c142d06c/2117667014/boys-profile-picture-screenshot.png"
-          alt=""
-        />
-        <div className="userChatInfo">
-          <span>Jane</span>
-          <p>Hello</p>
-        </div>
-      </div>
+      ))}
     </div>
   );
 };
