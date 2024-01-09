@@ -1,12 +1,12 @@
-import { DocumentData, doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { ChatContext } from "../context/ChatContext";
-import { ChatContextAction, UserInfo } from "../types";
+import { Chat, ChatContextAction, UserInfo } from "../types";
 
 const Chats = () => {
-  const [chats, setChats] = useState<DocumentData>([]);
+  const [chats, setChats] = useState<Chat[]>([]);
   const currentUser = useContext(AuthContext);
   const { dispatch } = useContext(ChatContext);
 
@@ -15,7 +15,16 @@ const Chats = () => {
     if (currentUser) {
       unsub = onSnapshot(doc(db, "userChats", currentUser.uid), (doc) => {
         const data = doc.data();
-        if (data) setChats(data);
+        if (data)
+          setChats(
+            Object.entries(data).map((chat) => {
+              return {
+                chatId: chat[0],
+                userInfo: chat[1].userInfo,
+                date: chat[1].date,
+              };
+            })
+          );
       });
     }
 
@@ -24,24 +33,22 @@ const Chats = () => {
     };
   }, [currentUser]);
 
-  console.log(Object.entries(chats));
-
   const handleSelect = (userInfo: UserInfo) => {
     dispatch({ type: "CHANGE_USER", payload: userInfo } as ChatContextAction);
   };
 
   return (
     <div className="chats">
-      {Object.entries(chats)?.map((chat) => (
+      {chats.map((chat) => (
         <div
           className="userChat"
-          key={chat[0]}
-          onClick={() => handleSelect(chat[1].userInfo)}
+          key={chat.chatId}
+          onClick={() => handleSelect(chat.userInfo)}
         >
-          <img src={chat[1].userInfo.photoURL} alt="" />
+          <img src={chat.userInfo.photoURL} alt="" />
           <div className="userChatInfo">
-            <span>{chat[1].userInfo.displayName}</span>
-            <p>{chat[1].userInfo.lastMessage?.text}</p>
+            <span>{chat.userInfo.displayName}</span>
+            <p>{chat.userInfo.lastMessage}</p>
           </div>
         </div>
       ))}

@@ -4,7 +4,7 @@ import { Chat, ChatContextAction } from "../types";
 
 const INITIAL_STATE: Chat = {
   chatId: "",
-  user: { displayName: "", photoURL: "", uid: "" },
+  userInfo: { displayName: "", photoURL: "", uid: "" },
 };
 
 export const ChatContext = createContext<{
@@ -20,7 +20,7 @@ export const ChatContextProvider = ({ children }: { children: ReactNode }) => {
       case "CHANGE_USER":
         if (currentUser)
           return {
-            user: action.payload,
+            userInfo: action.payload,
             chatId:
               currentUser.uid > action.payload.uid
                 ? currentUser.uid + action.payload.uid
