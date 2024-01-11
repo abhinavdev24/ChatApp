@@ -1,6 +1,10 @@
 import { FormEvent, useState } from "react";
 import { auth } from "../firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -21,6 +25,17 @@ const Login = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      setErr(true);
+    }
+  };
+
   return (
     <div className="formContainer">
       <div className="formWrapper">
@@ -32,6 +47,13 @@ const Login = () => {
           <button>Sign in</button>
           {err && <span> Something went wrong </span>}
         </form>
+        <button onClick={handleGoogleSignIn}>
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+            alt=""
+          />
+          <span>Sign in with Google</span>
+        </button>
         <p>
           You do not have an account? <Link to="/register">Register</Link>
         </p>
